@@ -26,3 +26,21 @@ tasks.test {
 kotlin {
     jvmToolchain(17)
 }
+
+/**
+ * https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
+ */
+tasks.register<Jar>("buildJar") {
+    manifest {
+        attributes["Main-Class"] = "me.bossm0n5t3r.kolidays.batch.MainKt"
+    }
+
+    // To avoid the duplicate handling strategy error
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+}
