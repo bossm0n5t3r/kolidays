@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0")
 
     testImplementation(kotlin("test"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
