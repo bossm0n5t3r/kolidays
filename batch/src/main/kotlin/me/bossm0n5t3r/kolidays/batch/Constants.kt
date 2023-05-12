@@ -1,6 +1,11 @@
 package me.bossm0n5t3r.kolidays.batch
 
+import java.nio.file.Paths
+
 object Constants {
+    const val TAB = "\t"
+    val PROJECT_DIR_ABSOLUTE_PATH = Paths.get("").toAbsolutePath().toString()
+
     object DefaultValue {
         const val SECRET_KEY = "SERVICE_KEY"
     }
