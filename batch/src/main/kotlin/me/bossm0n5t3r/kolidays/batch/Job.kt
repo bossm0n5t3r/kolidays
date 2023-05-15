@@ -2,6 +2,7 @@ package me.bossm0n5t3r.kolidays.batch
 
 import Kolidays
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.oshai.KotlinLogging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import me.bossm0n5t3r.kolidays.batch.Constants.TAB
@@ -14,20 +15,21 @@ import java.nio.file.Paths
 import java.time.LocalDateTime
 
 class Job {
+    private val logger = KotlinLogging.logger {}
     private val batchHttpClient = BatchHttpClient()
 
     fun batch() {
-        val now = LocalDateTime.now().also { println("[BATCH][MAIN][START] time: $it") }
+        val now = LocalDateTime.now().also { logger.info("[BATCH][MAIN][START] time: $it") }
         val thisYear = now.year
 
         // Get all holidays in this year
         val allHolidaysInThisYear = getAllHolidaysInYear(thisYear)
             .also {
-                println("[BATCH] Get all holidays in this year - result count: ${it.size}")
+                logger.info("[BATCH] Get all holidays in this year - result count: ${it.size}")
             }
 
         val isUpdated = Kolidays.ALL_HOLIDAYS_IN_THIS_YEAR != allHolidaysInThisYear
-        println("[BATCH] isUpdated: $isUpdated")
+        logger.info { "[BATCH] isUpdated: $isUpdated" }
 
         if (isUpdated) {
             val newFileLines = listOf(
@@ -48,13 +50,13 @@ class Job {
                 "/core/src/main/kotlin/Kolidays.kt",
             ).toFile()
                 .also {
-                    println("[BATCH] Get Kolidays File")
+                    logger.info("[BATCH] Get Kolidays File")
                 }
 
             // Clear Kolidays File
             FileOutputStream(kolidaysFile).close()
                 .also {
-                    println("[BATCH] Clear Kolidays File")
+                    logger.info("[BATCH] Clear Kolidays File")
                 }
 
             // Write Kolidays File
@@ -64,16 +66,18 @@ class Job {
                 }
             }
                 .also {
-                    println("[BATCH] Write Kolidays File")
+                    logger.info("[BATCH] Write Kolidays File")
                 }
         }
 
-        println("[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}")
+        logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
     }
 
     private fun getAllHolidaysInYear(year: Int) = runBlocking {
+        logger.info { "[BATCH][START] getAllHolidaysInYear" }
         (1..12).flatMap { month ->
             delay(100L)
+            logger.info { "${TAB}year: $year, month: $month" }
 
             val json = batchHttpClient.getHolidaysJson(
                 pageNo = 1,
@@ -90,5 +94,8 @@ class Job {
                 ?.map { it.locdate.toString().fromYYYYMMDDToLocalDate() }
                 ?: emptyList()
         }.toSet()
+            .also {
+                logger.info { "[BATCH][DONE] getAllHolidaysInYear" }
+            }
     }
 }
