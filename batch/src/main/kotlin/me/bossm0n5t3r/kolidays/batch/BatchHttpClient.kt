@@ -15,17 +15,21 @@ class BatchHttpClient {
         pageNo: Int,
         numOfRows: Int,
         year: Int,
-        month: Int,
+        month: Int? = null,
     ): String {
         return baseUrl +
             "?${"serviceKey".toUrlEncode()}=$serviceKey" +
             "&${"pageNo".toUrlEncode()}=${pageNo.toString().toUrlEncode()}" +
             "&${"numOfRows".toUrlEncode()}=${numOfRows.toString().toUrlEncode()}" +
             "&${"solYear".toUrlEncode()}=${year.toString().toUrlEncode()}" +
-            "&${"solMonth".toUrlEncode()}=${month.toString().padStart(2, '0').toUrlEncode()}"
+            if (month != null) {
+                "&${"solMonth".toUrlEncode()}=${month.toString().padStart(2, '0').toUrlEncode()}"
+            } else {
+                ""
+            }
     }
 
-    fun getHolidaysJson(pageNo: Int, numOfRows: Int, year: Int, month: Int): String {
+    fun getHolidaysJson(pageNo: Int, numOfRows: Int, year: Int, month: Int? = null): String {
         val url = generateUrl(
             BatchProperties.SERVICE_KEY,
             pageNo,
