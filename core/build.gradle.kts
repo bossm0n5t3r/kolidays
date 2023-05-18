@@ -1,26 +1,38 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
+    java
     kotlin("jvm") version "1.8.20"
-
-    application
+    `maven-publish`
 }
-
-group = "me.bossm0n5t3r.kolidays"
-version = "0.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget = "1.8"
+    }
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(8)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "me.bossm0n5t3r"
+            artifactId = "kolidays"
+            version = "0.0.1"
+
+            from(components["java"])
+        }
+    }
 }
