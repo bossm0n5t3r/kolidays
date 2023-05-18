@@ -3,8 +3,6 @@ package me.bossm0n5t3r.kolidays.batch
 import Kolidays
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.KotlinLogging
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import me.bossm0n5t3r.kolidays.batch.Constants.TAB
 import me.bossm0n5t3r.kolidays.batch.Utils.fromYYYYMMDDToLocalDate
 import me.bossm0n5t3r.kolidays.batch.Utils.objectMapper
@@ -12,6 +10,7 @@ import me.bossm0n5t3r.kolidays.batch.Utils.toConstructorString
 import me.bossm0n5t3r.kolidays.batch.dto.HolidaysResponseWrapper
 import java.io.FileOutputStream
 import java.nio.file.Paths
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class Job {
@@ -73,29 +72,24 @@ class Job {
         logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
     }
 
-    private fun getAllHolidaysInYear(year: Int) = runBlocking {
-        logger.info { "[BATCH][START] getAllHolidaysInYear" }
-        (1..12).flatMap { month ->
-            delay(100L)
-            logger.info { "${TAB}year: $year, month: $month" }
+    private fun getAllHolidaysInYear(year: Int): Set<LocalDate> {
+        logger.info { "[BATCH][START] getAllHolidaysInYear | year: $year" }
+        val json = batchHttpClient.getHolidaysJson(
+            pageNo = 1,
+            numOfRows = 100,
+            year = year,
+        )
 
-            val json = batchHttpClient.getHolidaysJson(
-                pageNo = 1,
-                numOfRows = 10,
-                year = year,
-                month = month,
-            )
+        val result = objectMapper.readValue<HolidaysResponseWrapper>(json)
+            .response
+            .body
+            .items
+            ?.item
+            ?.map { it.locdate.toString().fromYYYYMMDDToLocalDate() }
+            ?.toSet()
+            ?: emptySet()
 
-            objectMapper.readValue<HolidaysResponseWrapper>(json)
-                .response
-                .body
-                .items
-                ?.item
-                ?.map { it.locdate.toString().fromYYYYMMDDToLocalDate() }
-                ?: emptyList()
-        }.toSet()
-            .also {
-                logger.info { "[BATCH][DONE] getAllHolidaysInYear" }
-            }
+        logger.info { "[BATCH][DONE] getAllHolidaysInYear | year: $year" }
+        return result
     }
 }
