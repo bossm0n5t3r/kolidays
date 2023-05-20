@@ -13,6 +13,7 @@ import java.io.FileOutputStream
 import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.system.exitProcess
 
 class Job {
     private val logger = KotlinLogging.logger {}
@@ -34,9 +35,12 @@ class Job {
         if (isUpdated) {
             updateKolidaysFile(allHolidaysInThisYear)
             updateKolidaysVersion(now)
+            logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
+            exitProcess(0)
         }
 
         logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
+        exitProcess(1)
     }
 
     private fun getAllHolidaysInYear(year: Int): Set<LocalDate> {
