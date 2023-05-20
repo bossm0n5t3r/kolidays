@@ -40,8 +40,7 @@ jobs:
 
       - name: Run batch package
         run: |
-          java -jar ./batch/build/libs/batch.jar
-          echo ::set-output name=exit_code::$?
+          java -jar ./batch/build/libs/batch.jar && echo ::set-output name=exit_code::0 || echo ::set-output name=exit_code::1
 
       - name: Replace SECRET_KEY originally
         if: steps.build.outputs.exit_code == 0
