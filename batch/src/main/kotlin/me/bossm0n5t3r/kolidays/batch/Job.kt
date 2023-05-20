@@ -4,6 +4,7 @@ import Kolidays
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.KotlinLogging
 import me.bossm0n5t3r.kolidays.batch.Constants.TAB
+import me.bossm0n5t3r.kolidays.batch.Utils.KOLIDAYS_VERSION_FORMAT
 import me.bossm0n5t3r.kolidays.batch.Utils.fromYYYYMMDDToLocalDate
 import me.bossm0n5t3r.kolidays.batch.Utils.objectMapper
 import me.bossm0n5t3r.kolidays.batch.Utils.toConstructorString
@@ -32,6 +33,7 @@ class Job {
 
         if (isUpdated) {
             updateKolidaysFile(allHolidaysInThisYear)
+            updateKolidaysVersion(now)
         }
 
         logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
@@ -95,5 +97,58 @@ class Job {
             .also {
                 logger.info("[BATCH] Write Kolidays File")
             }
+    }
+
+    private fun updateKolidaysVersion(now: LocalDateTime) {
+        // Get gradle.properties File
+        val gradleProperties = Paths.get(
+            Constants.PROJECT_DIR_ABSOLUTE_PATH,
+            "/core/gradle.properties",
+        ).toFile()
+            .also {
+                logger.info("[BATCH] Get gradle.properties File")
+            }
+
+        // Get current version
+        val kolidaysVersion = gradleProperties
+            .readLines()
+            .firstOrNull { it.startsWith("kolidaysVersion") }
+            ?.split("=")
+            ?.lastOrNull()
+            ?.trim()
+            ?: throw Exception("Not found kolidaysVersion in core/gradle.properties")
+
+        val kolidaysVersionAsDate = LocalDate.parse(kolidaysVersion, KOLIDAYS_VERSION_FORMAT)
+
+        if (kolidaysVersionAsDate.isBefore(now.toLocalDate())) {
+            // Update version
+            val newKolidaysVersion = KOLIDAYS_VERSION_FORMAT.format(now)
+
+            // Get all lines in gradle.properties File
+            val currentGradlePropertiesLines = gradleProperties.readLines()
+            val updatedGradlePropertiesLines = currentGradlePropertiesLines.map {
+                if (it.startsWith("kolidaysVersion")) {
+                    it.replace(kolidaysVersion, newKolidaysVersion)
+                } else {
+                    it
+                }
+            }
+
+            // Clear gradle.properties File
+            FileOutputStream(gradleProperties).close()
+                .also {
+                    logger.info("[BATCH] Clear gradle.properties File")
+                }
+
+            // Write Kolidays File
+            gradleProperties.bufferedWriter().use {
+                updatedGradlePropertiesLines.forEach { line ->
+                    it.appendLine(line)
+                }
+            }
+                .also {
+                    logger.info("[BATCH] Write gradle.properties File")
+                }
+        }
     }
 }
