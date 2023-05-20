@@ -13,11 +13,55 @@ jobs:
         env:
           SERVICE_KEY: ${{ secrets.SERVICE_KEY }}
         run: |
-          cat batch/src/main/resources/application.conf
-          echo '========================='
           sed -i -r "s/^(serviceKey =).*/\1 $SERVICE_KEY/" ./batch/src/main/resources/application.conf
           cat batch/src/main/resources/application.conf
-          echo '========================='
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build batch package
+        run: gradle clean :batch:buildJar
+
+      - name: Run batch package
+        run: java -jar ./batch/build/libs/batch.jar
+
+      - name: Replace SECRET_KEY originally
+        run: |
           sed -i -r "s/^(serviceKey =).*/\1 SERVICE_KEY/" ./batch/src/main/resources/application.conf
           cat batch/src/main/resources/application.conf
-          echo '========================='
+
+      - name: Commit and Push
+        run: |
+          git add .
+          git commit -m "[ACTIONS] feat: Run batch to update core"
+          git push
+
+      - name: Tag and Push
+        env:
+          NEW_TAG: date +"%y.%m.%d"
+        run: |
+          git tag -a $NEW_TAG -m ":octocat:"
+          git push --tags
+
+      - name: Cleanup Gradle Cache
+        # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
+        # Restoring these files from a GitHub Actions cache might cause problems for future builds.
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
