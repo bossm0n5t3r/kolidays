@@ -9,5 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: git remote -v
-        run : git remote -v
+      - name: Replace SECRET_KEY
+        env:
+          SERVICE_KEY: ${{ secrets.SERVICE_KEY }}
+        run: |
+          cat batch/src/main/resources/application.conf
+          echo '========================='
+          sed -i '' 's/${SERVICE_KEY}/SERVICE_KEY/g' batch/src/main/resources/application.conf
+          cat batch/src/main/resources/application.conf
+          echo '========================='
+          sed -i '' 's/SERVICE_KEY/${SERVICE_KEY}/g' batch/src/main/resources/application.conf
+          cat batch/src/main/resources/application.conf
+          echo '========================='
