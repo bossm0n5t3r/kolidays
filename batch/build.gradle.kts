@@ -4,9 +4,6 @@ plugins {
     application
 }
 
-group = "me.bossm0n5t3r.kolidays"
-version = "0.0.1-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
