@@ -18,5 +18,6 @@ object Kolidays {
         LocalDate.of(2023, 9, 30),
         LocalDate.of(2023, 10, 3),
         LocalDate.of(2023, 10, 9),
+        LocalDate.of(2023, 12, 25),
     )
 }
