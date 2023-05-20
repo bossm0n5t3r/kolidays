@@ -40,16 +40,18 @@ jobs:
 
       - name: Run batch package
         run: |
-          java -jar ./batch/build/libs/batch.jar && echo ::set-output name=exit_code::0 || echo ::set-output name=exit_code::1
+          exit_code=-1
+          java -jar ./batch/build/libs/batch.jar && exit_code=0 || exit_code=1
+          echo "EXIT_CODE=$exit_code" >> "$GITHUB_ENV"
 
       - name: Replace SECRET_KEY originally
-        if: steps.build.outputs.exit_code == 0
+        if: env.EXIT_CODE == 0
         run: |
           sed -i -r "s/^(serviceKey =).*/\1 SERVICE_KEY/" ./batch/src/main/resources/application.conf
           cat batch/src/main/resources/application.conf
 
       - name: git config name, email
-        if: steps.build.outputs.exit_code == 0
+        if: env.EXIT_CODE == 0
         env:
           user_name: ${{ vars.USER_NAME }}
           user_email: ${{ vars.USER_EMAIL }}
@@ -58,14 +60,14 @@ jobs:
           git config --global user.name $user_name
 
       - name: Commit and Push
-        if: steps.build.outputs.exit_code == 0
+        if: env.EXIT_CODE == 0
         run: |
           git add .
           git commit -m "[ACTIONS] feat: Run batch to update core"
           git push
 
       - name: Tag and Push
-        if: steps.build.outputs.exit_code == 0
+        if: env.EXIT_CODE == 0
         env:
           NEW_TAG: date +"%y.%m.%d"
         run: |
