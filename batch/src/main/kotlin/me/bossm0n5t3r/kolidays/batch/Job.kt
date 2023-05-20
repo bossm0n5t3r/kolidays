@@ -31,42 +31,7 @@ class Job {
         logger.info { "[BATCH] isUpdated: $isUpdated" }
 
         if (isUpdated) {
-            val newFileLines = listOf(
-                "import java.time.LocalDate",
-                "",
-                "object Kolidays {",
-                "${TAB}val ALL_HOLIDAYS_IN_THIS_YEAR = setOf(",
-            ) + allHolidaysInThisYear.map {
-                "$TAB$TAB${it.toConstructorString()},"
-            } + listOf(
-                "$TAB)",
-                "}",
-            )
-
-            // Get Kolidays File
-            val kolidaysFile = Paths.get(
-                Constants.PROJECT_DIR_ABSOLUTE_PATH,
-                "/core/src/main/kotlin/Kolidays.kt",
-            ).toFile()
-                .also {
-                    logger.info("[BATCH] Get Kolidays File")
-                }
-
-            // Clear Kolidays File
-            FileOutputStream(kolidaysFile).close()
-                .also {
-                    logger.info("[BATCH] Clear Kolidays File")
-                }
-
-            // Write Kolidays File
-            kolidaysFile.bufferedWriter().use {
-                newFileLines.forEach { line ->
-                    it.appendLine(line)
-                }
-            }
-                .also {
-                    logger.info("[BATCH] Write Kolidays File")
-                }
+            updateKolidaysFile(allHolidaysInThisYear)
         }
 
         logger.info { "[BATCH][MAIN][FINISH] time: ${LocalDateTime.now()}" }
@@ -91,5 +56,44 @@ class Job {
 
         logger.info { "[BATCH][DONE] getAllHolidaysInYear | year: $year" }
         return result
+    }
+
+    private fun updateKolidaysFile(allHolidaysInThisYear: Set<LocalDate>) {
+        val newFileLines = listOf(
+            "import java.time.LocalDate",
+            "",
+            "object Kolidays {",
+            "${TAB}val ALL_HOLIDAYS_IN_THIS_YEAR = setOf(",
+        ) + allHolidaysInThisYear.map {
+            "$TAB$TAB${it.toConstructorString()},"
+        } + listOf(
+            "$TAB)",
+            "}",
+        )
+
+        // Get Kolidays File
+        val kolidaysFile = Paths.get(
+            Constants.PROJECT_DIR_ABSOLUTE_PATH,
+            "/core/src/main/kotlin/Kolidays.kt",
+        ).toFile()
+            .also {
+                logger.info("[BATCH] Get Kolidays File")
+            }
+
+        // Clear Kolidays File
+        FileOutputStream(kolidaysFile).close()
+            .also {
+                logger.info("[BATCH] Clear Kolidays File")
+            }
+
+        // Write Kolidays File
+        kolidaysFile.bufferedWriter().use {
+            newFileLines.forEach { line ->
+                it.appendLine(line)
+            }
+        }
+            .also {
+                logger.info("[BATCH] Write Kolidays File")
+            }
     }
 }
