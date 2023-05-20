@@ -15,9 +15,9 @@ jobs:
         run: |
           cat batch/src/main/resources/application.conf
           echo '========================='
-          sed -i '' 's/${SERVICE_KEY}/SERVICE_KEY/g' batch/src/main/resources/application.conf
+          sed -i -r "s/^(serviceKey =).*/\1 $SERVICE_KEY/" ./batch/src/main/resources/application.conf
           cat batch/src/main/resources/application.conf
           echo '========================='
-          sed -i '' 's/SERVICE_KEY/${SERVICE_KEY}/g' batch/src/main/resources/application.conf
+          echo 'serviceKey = SERVICE_KEY' >> ./batch/src/main/resources/application.conf
           cat batch/src/main/resources/application.conf
           echo '========================='
