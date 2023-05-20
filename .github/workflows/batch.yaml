@@ -69,8 +69,8 @@ jobs:
       - name: Tag and Push
         if: env.EXIT_CODE == 0
         run: |
-          new_date=$(date +"%y.%m.%d")
-          git tag -a $new_tag -m ":octocat:"
+          NEW_DATE=$(date +"%y.%m.%d")
+          git tag -a "${NEW_DATE}" -m ":octocat:"
           git push --tags
 
       - name: Cleanup Gradle Cache
