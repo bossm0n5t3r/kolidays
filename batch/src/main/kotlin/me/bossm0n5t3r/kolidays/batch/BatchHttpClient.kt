@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets
 class BatchHttpClient {
     private val baseUrl = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
 
-    private fun String.toUrlEncode(): String = URLEncoder.encode(this, StandardCharsets.UTF_8)
+    private fun String.toUrlEncode(): String = URLEncoder.encode(this, StandardCharsets.UTF_8.displayName())
 
     private fun generateUrl(
         serviceKey: String,
