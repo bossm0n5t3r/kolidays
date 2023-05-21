@@ -66,8 +66,8 @@ class Job {
 
     private fun updateKolidaysFile(allHolidaysInThisYear: Set<LocalDate>) {
         val newFileLines = listOf(
-            "import java.time.LocalDate",
-            "",
+            "package me.bossm0n5t3r.kolidays\n",
+            "import java.time.LocalDate\n",
             "object Kolidays {",
             "${TAB}val ALL_HOLIDAYS_IN_THIS_YEAR = setOf(",
         ) + allHolidaysInThisYear.map {
