@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+private val kolidaysVersion: String by project
+
 plugins {
     java
     kotlin("jvm") version "1.8.20"
@@ -30,7 +32,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "me.bossm0n5t3r"
             artifactId = "kolidays"
-            version = "0.0.1"
+            version = kolidaysVersion
 
             from(components["java"])
         }

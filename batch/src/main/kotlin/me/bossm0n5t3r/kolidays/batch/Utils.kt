@@ -18,4 +18,6 @@ object Utils {
     }
 
     fun LocalDate.toConstructorString() = "LocalDate.of(${this.year}, ${this.monthValue}, ${this.dayOfMonth})"
+
+    val KOLIDAYS_VERSION_FORMAT = DateTimeFormatter.ofPattern("yy.MM.dd")
 }
