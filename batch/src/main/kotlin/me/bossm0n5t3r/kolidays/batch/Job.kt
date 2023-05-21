@@ -1,8 +1,8 @@
 package me.bossm0n5t3r.kolidays.batch
 
-import Kolidays
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.KotlinLogging
+import me.bossm0n5t3r.kolidays.Kolidays
 import me.bossm0n5t3r.kolidays.batch.Constants.TAB
 import me.bossm0n5t3r.kolidays.batch.Utils.KOLIDAYS_VERSION_FORMAT
 import me.bossm0n5t3r.kolidays.batch.Utils.fromYYYYMMDDToLocalDate
@@ -80,7 +80,7 @@ class Job {
         // Get Kolidays File
         val kolidaysFile = Paths.get(
             Constants.PROJECT_DIR_ABSOLUTE_PATH,
-            "/core/src/main/kotlin/Kolidays.kt",
+            "/core/src/main/kotlin/me/bossm0n5t3r/kolidays/Kolidays.kt",
         ).toFile()
             .also {
                 logger.info("[BATCH] Get Kolidays File")

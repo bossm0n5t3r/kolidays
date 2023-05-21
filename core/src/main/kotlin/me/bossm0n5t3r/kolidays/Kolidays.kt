@@ -1,3 +1,5 @@
+package me.bossm0n5t3r.kolidays
+
 import java.time.LocalDate
 
 object Kolidays {
